@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/nelsandrc/COVID19Visualizer#readme",
   "dependencies": {
-    "circular-json": "^0.5.9"
+    "circular-json": "^0.5.9",
+    "mysql": "^2.18.1"
   }
 }
