@@ -38,8 +38,8 @@ async function execute(){
 
         };
 
-        console.log(dataToInsert);
-      //  insertStatement(dataToInsert);
+        //console.log(dataToInsert);
+        insertStatement(dataToInsert);
     }
 
 
