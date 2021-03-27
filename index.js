@@ -59,7 +59,7 @@ const CircularJSON = require('circular-json');
 
         console.log("Here is the Data:");
         console.log(data);
-        
+
         //Returns JSON with data 
         return data;
 

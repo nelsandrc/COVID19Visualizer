@@ -8,6 +8,7 @@ const connection = mysql.createConnection({
     database: 'Covid',
 
     });
+
 //Enables Created mySQL connnection
 connection.connect(function(err) {
     if (err) {
@@ -18,6 +19,11 @@ connection.connect(function(err) {
        connectSuccess = true;
        
     });
+
+
+    exports.getConnection = function() {
+        return connection;
+    }
 
         
 /**
@@ -31,8 +37,9 @@ exports.insertStatement = function(data){
 
     connection.query('INSERT INTO Covid_report SET ?', data, (err,results)=> {
         if(err)  console.log(err);
-
-        console.log('Inserting Row');
+        
+            return true;
+        //console.log('Inserting Row');
 
     })
 

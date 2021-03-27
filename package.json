@@ -4,7 +4,7 @@
   "description": "Covid-19 Data Scraper",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/nelsandrc/COVID19Visualizer#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "circular-json": "^0.5.9",
+    "jasmine-node": "^3.0.0",
     "mysql": "^2.18.1"
-  }
+  },
+  "devDependencies": {}
 }
