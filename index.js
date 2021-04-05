@@ -1,5 +1,7 @@
 const axios = require("axios");
 const CircularJSON = require('circular-json');
+const fetch = require('node-fetch');
+const fs = require('fs');
 
 /**
  * @description Meant to fetch data from the CDC proivded API
@@ -20,17 +22,19 @@ const CircularJSON = require('circular-json');
     let submission_date = date.toISOString().slice(0, -14);
 
     //Fetches data from API from todays date
-    let {data} = await axios.get(url + submission_date + param);
-
+    let cdcResponse = await fetch(url + submission_date + param);
+    let data = await cdcResponse.json();
+   
     //Keeps lookinf for data if data from submission date contained none
-    while(CircularJSON.stringify(data.data) == '[]' || data.data == null){
+    while(data.length == 0){
         //Sets date to one day prior to one the one its at right now
         date.setDate(date.getDate()-1);
         submission_date = await date.toISOString().slice(0, -14);
 
         console.log('New Date: ' + submission_date);
         //fetches data from new submission date
-        data = await axios.get(url + submission_date + param);
+        cdcResponse = await fetch(url + submission_date + param);
+        data = await cdcResponse.json();
         }
     
     console.log("found data for this date: " + submission_date);
@@ -39,6 +43,9 @@ const CircularJSON = require('circular-json');
     return data;
     }
 
+    const pfizerURL = 'https://data.cdc.gov/resource/saz5-9hgg.json?week_of_allocations=2021-04-05T00:00:00.000';
+    const modernaURL = 'https://data.cdc.gov/resource/b7pe-5nws.json?week_of_allocations=2021-04-05T00:00:00.000';
+    const jansUrl = 'https://data.cdc.gov/resource/w9zu-fywh.json?week_of_allocations=2021-04-05T00:00:00.000';
 
     /**
      * @description Get Data From Data USA API to retreive
@@ -50,21 +57,32 @@ const CircularJSON = require('circular-json');
      * @returns JSON Object with 
      * 
      */
-    async function getState(){
+    async function getVacData(){
 
-        //url to retrieve data fro API
-        const url = "https://datausa.io/api/data?drilldowns=State&measure=HouseholdIncomeByRace&year=latest";
+
         //Fetch Data 
-        let {data} = await axios.get(url);
+        let pResponse = await fetch(pfizerURL);
+        let pfizerData = await pResponse.json();
 
-        console.log("Here is the Data:");
-        console.log(data);
+        let mResponse = await fetch(modernaURL);
+        let modernaData = await mResponse.json();
 
+        let jResponse = await fetch(jansUrl);
+        let jansData = await jResponse.json();
+
+        
+  
+        // while(cdcData.length == 0){
+        //     console.log('NO DATA');
+        // }
+    
+        //console.log(pfizerData);
         //Returns JSON with data 
-        return data;
+        //return ;
 
     }
 
-module.exports.getStateData = getState;
+
+module.exports.getVac = getVacData;
 module.exports.getAPIData = getCDCdata;
 

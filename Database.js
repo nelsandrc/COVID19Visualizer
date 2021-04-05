@@ -37,64 +37,28 @@ exports.insertStatement = function(data){
 
     connection.query('INSERT INTO Covid_report SET ?', data, (err,results)=> {
         if(err)  console.log(err);
-        
-            return true;
-        //console.log('Inserting Row');
+
 
     })
 
 };
 
 //Retrieves data from our mySQL database
-exports.getStatement = connection.query('SELECT * FROM Covid_report', function (error, results, fields) {
+exports.getStatement = function(subDate){
+
+    connection.query('SELECT date FROM Covid_report WHERE date = '+ mysql.escape(subDate), function (error, results) {
         if(error){
             throw error;
         }
-
-    
+     
+        let rowResult = results[0].date;
+        console.log(rowResult);
+        return results;
     })
+};
 
 //Ends connecion to our database
 exports.endConnection = function() {
         connection.end();
     }
 
-/* connection.connect(function(err) {
-if (err) {
-    console.log("Got Error: " + err.stack);
-}
-    console.log("Connection Succesful!");
-    console.log("Connected as id " + connection.threadId);
-
-});
-
-const dataToInsert = {
-    ID: '20211003WI',
-    date: '2021-10-03',
-    location: 'Wisconsin',
-    totaltest: 32323,
-    n_recover: 23233,
-    totalconfirm: 2323,
-    recoverrate: 3,
-    n_death: 2323,
-    deathrate: 353323
-};
-
-connection.query('INSERT INTO Covid_report SET ?', dataToInsert, (err,results) => {
-    if(err) throw err;
-
-    console.log('Last insert ID: ', results.insertId);
-} )
-
-connection.query('SELECT * FROM Covid_report', function (error, results, fields) {
-    if(error){
-        throw error;
-    }
-
-    results.forEach(result => {
-        console.log(result);
-    })
-
-});
-
-connection.end(); */

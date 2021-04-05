@@ -20,7 +20,8 @@
     "axios": "^0.21.1",
     "circular-json": "^0.5.9",
     "jasmine-node": "^3.0.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {}
 }

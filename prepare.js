@@ -1,9 +1,9 @@
 const covidData = require('./index.js').getAPIData;
-const stateData = require('./index.js').getStateData;
+const vacData = require('./index.js').getVac;
 const connection = require('./Database.js');
 const endConnection = connection.endConnection;
 const insertStatement = connection.insertStatement;
-const getStatement = connection.getStatement;
+
 
 //Location Name Conversions
 const nameConv = {
@@ -71,14 +71,11 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 async function execute(){
 
     console.log('Executing');
-    var {data} = await covidData();
+    //retreives data that was fetched from CDC API
+    var data = await covidData();
+
+    var vac = await vacData();
     
-    //console.log(data);
-
-    //console.log('Gettign state data');
-    //var {stateD} = await stateData();
-
-    //console.log(stateD);
     console.log('Begining Insertion of Data');
     //Inserts each row of data into the mySQL
     for(var row in data){
@@ -107,15 +104,12 @@ async function execute(){
     
     console.log('Completed Insertion of Data');
 
-  let dbData = getStatement._results;
-
-  //console.log(dbData);
-
 endConnection();
 
 }
 
 execute();
+
 
 
 
