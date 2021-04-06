@@ -38,24 +38,26 @@ exports.insertStatement = function(data){
     connection.query('INSERT INTO Covid_report SET ?', data, (err,results)=> {
         if(err)  console.log(err);
 
+    })
+
+};
+
+/**
+ * @description Inserts Array of Vaccine data into into Database
+ *              into Vaccine_report table 
+ * 
+ * 
+ * @param {Array} data 
+ */
+ exports.insertVaccine = function(data){
+
+    connection.query('INSERT INTO Vaccine_Report SET ?', data, (err,results)=> {
+        if(err)  console.log(err);
 
     })
 
 };
 
-//Retrieves data from our mySQL database
-exports.getStatement = function(subDate){
-
-    connection.query('SELECT date FROM Covid_report WHERE date = '+ mysql.escape(subDate), function (error, results) {
-        if(error){
-            throw error;
-        }
-     
-        let rowResult = results[0].date;
-        console.log(rowResult);
-        return results;
-    })
-};
 
 //Ends connecion to our database
 exports.endConnection = function() {

@@ -1,51 +1,64 @@
-const axios = require("axios");
-const CircularJSON = require('circular-json');
 const fetch = require('node-fetch');
-const fs = require('fs');
-
-/**
- * @description Meant to fetch data from the CDC proivded API
- *              to retrieve data from certain parameters
- *              This includes total cases, new cases, total deaths, and new deaths 
- * 
- * @return Json object called data
- */
- async function getCDCdata(){
-            //CDC Rest API url
-    const url = 'https://data.cdc.gov/resource/9mfq-cb36.json?submission_date=';
-    //Paramaters we want from JSON
-    const param = '&$select=submission_date,state,tot_cases,new_case,tot_death,new_death';
+const connection = require('./Database.js');
+const insertVac = connection.insertVaccine;
 
 
-    //Creates date from todays date
-    const date = new Date();
-    let submission_date = date.toISOString().slice(0, -14);
+const nameConv = {
+    Alabama: 'AL',
+    Alaska: 'AK',
+   Arizona: 'AZ',
+   Arkansas: 'AR',
+   California: 'CA',
+   Colorado: 'CO',
+   Connecticut: 'CT',
+   Delaware: 'DE',
+   Florida: 'FL',
+   Georgia: 'GA',
+   Hawaii: 'HI',
+   Idaho: 'ID',
+   Illinois: 'IL',
+   Indiana: 'IN',
+   Iowa: 'IA',
+   Kansas: 'KS',
+   Kentucky: 'KY',
+   Louisiana: 'LA',
+   Maine: 'ME',
+   Maryland: 'MD',
+   Massachusetts: 'MA',
+   Michigan: 'MI',
+   Minnesota: 'MN',
+   Mississippi: 'MS',
+   Missouri: 'MO',
+   Montana: 'MT',
+   Nebraska: 'NE',
+   Nevada: 'NV',
+   NewHampshire: 'NH',
+   NewJersey: 'NJ',
+   NewMexico: 'NM',
+   NewYork: 'NY',
+   NorthCarolina: 'NC',
+   NorthDakota: 'ND',
+   Ohio: 'OH',
+   Oklahoma: 'OK',
+   Oregon: 'OR',
+   Pennsylvania: 'PA',
+   RhodeIsland: 'RI',
+   SouthCarolina: 'SC',
+   SouthDakota: 'SD',
+   Tennessee: 'TN',
+   Texas: 'TX',
+   Utah: 'UT',
+   Vermont: 'VT',
+   Virginia: 'VA',
+   Washington: 'WA',
+   WestVirginia: 'WV',
+   Wisconsin: 'WI',
+   Wyoming: 'WY'
+   };
 
-    //Fetches data from API from todays date
-    let cdcResponse = await fetch(url + submission_date + param);
-    let data = await cdcResponse.json();
-   
-    //Keeps lookinf for data if data from submission date contained none
-    while(data.length == 0){
-        //Sets date to one day prior to one the one its at right now
-        date.setDate(date.getDate()-1);
-        submission_date = await date.toISOString().slice(0, -14);
-
-        console.log('New Date: ' + submission_date);
-        //fetches data from new submission date
-        cdcResponse = await fetch(url + submission_date + param);
-        data = await cdcResponse.json();
-        }
-    
-    console.log("found data for this date: " + submission_date);
-    
-    //return the JSON object 
-    return data;
-    }
-
-    const pfizerURL = 'https://data.cdc.gov/resource/saz5-9hgg.json?week_of_allocations=2021-04-05T00:00:00.000';
-    const modernaURL = 'https://data.cdc.gov/resource/b7pe-5nws.json?week_of_allocations=2021-04-05T00:00:00.000';
-    const jansUrl = 'https://data.cdc.gov/resource/w9zu-fywh.json?week_of_allocations=2021-04-05T00:00:00.000';
+    const pfizerURL = 'https://data.cdc.gov/resource/saz5-9hgg.json?$limit=63';
+    const modernaURL = 'https://data.cdc.gov/resource/b7pe-5nws.json?$limit=63';
+    const jansUrl = 'https://data.cdc.gov/resource/w9zu-fywh.json?$limit=63';
 
     /**
      * @description Get Data From Data USA API to retreive
@@ -70,19 +83,85 @@ const fs = require('fs');
         let jResponse = await fetch(jansUrl);
         let jansData = await jResponse.json();
 
-        
-  
-        // while(cdcData.length == 0){
-        //     console.log('NO DATA');
-        // }
-    
-        //console.log(pfizerData);
-        //Returns JSON with data 
-        //return ;
+        console.log(pfizerData[0]);
+        console.log(modernaData[0]);
+        console.log(jansData[0]);
 
+
+
+        for(var row in pfizerData){
+
+            var loc = nameConv[pfizerData[row].jurisdiction];
+            if(typeof loc !== 'undefined'){
+
+            var date = pfizerData[row].week_of_allocations.slice(0,-13);
+            var totalVac = pfizerData[row]._1st_dose_allocations + pfizerData[row]._2nd_dose_allocations;
+    
+        
+
+            let pfizerInsert = {
+            vacID : 'pf' + date + loc,
+            location : pfizerData[row].jurisdiction,
+            week_of_allocation : date,
+            vaccine_amount : totalVac,
+            vaccine_type : 'Pfizer'
+            
+            }
+
+            console.log(pfizerInsert);
+
+            insertVac(pfizerInsert);
+        }
+    }
+
+    for(var row in modernaData){
+
+        var loc = nameConv[modernaData[row].jurisdiction];
+        if(typeof loc !== 'undefined'){
+
+        var date = modernaData[row].week_of_allocations.slice(0,-13);
+        var totalVac = modernaData[row]._1st_dose_allocations + modernaData[row]._2nd_dose_allocations;
+
+
+        let modernaInsert = {
+        vacID : 'mo' + date + loc,
+        location : modernaData[row].jurisdiction,
+        week_of_allocation : date,
+        vaccine_amount : totalVac,
+        vaccine_type : 'Moderna'
+        
+        }
+
+        console.log(modernaInsert);
+
+        //insertVAc(modernaInsert);
+        }
+    }
+
+    for(var row in jansData){
+
+        var loc = nameConv[jansData[row].jurisdiction];
+        if(typeof loc !== 'undefined'){
+
+        var date = jansData[row].week_of_allocations.slice(0,-13);
+
+
+        let jansInsert = {
+        vacID : 'ja' + date + loc,
+        location : jansData[row].jurisdiction,
+        week_of_allocation : date,
+        vaccine_amount : jansData[row]._1st_dose_allocations,
+        vaccine_type : 'Janssen'
+        
+        }
+
+        console.log(jansInsert);
+        }
     }
 
 
-module.exports.getVac = getVacData;
-module.exports.getAPIData = getCDCdata;
+    }
+
+    getVacData();
+
 
