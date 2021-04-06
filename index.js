@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const connection = require('./Database.js');
+const endConnection = connection.endConnection;
 const insertVac = connection.insertVaccine;
 
 
@@ -83,15 +84,12 @@ const nameConv = {
         let jResponse = await fetch(jansUrl);
         let jansData = await jResponse.json();
 
-        console.log(pfizerData[0]);
-        console.log(modernaData[0]);
-        console.log(jansData[0]);
 
-
+        console.log('Inserting Pfizer Data');
 
         for(var row in pfizerData){
 
-            var loc = nameConv[pfizerData[row].jurisdiction];
+            var loc = nameConv[pfizerData[row].jurisdiction.replace(/\s/g,"")];
             if(typeof loc !== 'undefined'){
 
             var date = pfizerData[row].week_of_allocations.slice(0,-13);
@@ -108,15 +106,15 @@ const nameConv = {
             
             }
 
-            console.log(pfizerInsert);
+      
 
             insertVac(pfizerInsert);
         }
     }
-
+        console.log('Inserting Moderna Data');
     for(var row in modernaData){
 
-        var loc = nameConv[modernaData[row].jurisdiction];
+        var loc = nameConv[modernaData[row].jurisdiction.replace(/\s/g,"")];
         if(typeof loc !== 'undefined'){
 
         var date = modernaData[row].week_of_allocations.slice(0,-13);
@@ -132,15 +130,15 @@ const nameConv = {
         
         }
 
-        console.log(modernaInsert);
+    
 
-        //insertVAc(modernaInsert);
+        insertVac(modernaInsert);
         }
     }
-
+    console.log('Inserting Janssen Data');
     for(var row in jansData){
 
-        var loc = nameConv[jansData[row].jurisdiction];
+        var loc = nameConv[jansData[row].jurisdiction.replace(/\s/g,"")];
         if(typeof loc !== 'undefined'){
 
         var date = jansData[row].week_of_allocations.slice(0,-13);
@@ -155,12 +153,15 @@ const nameConv = {
         
         }
 
-        console.log(jansInsert);
+    
+
+        insertVac(jansInsert);
         }
     }
 
+    endConnection();
 
-    }
+}
 
     getVacData();
 
