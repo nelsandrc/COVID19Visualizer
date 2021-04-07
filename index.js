@@ -62,13 +62,13 @@ const nameConv = {
     const jansUrl = 'https://data.cdc.gov/resource/w9zu-fywh.json?$limit=63';
 
     /**
-     * @description Get Data From Data USA API to retreive
-     *              data with certain parameters which include,
-     *              the Median Household Income of each state and 
-     *              will retrieve the latest data  
+     * @description Get Data From Data CDC API to retreive
+     *              data relating to Coid-19 vaccine
+     *              this included infromation on the Moderna,
+     *              Pfizer, and Janssen vaccine
      * 
      * 
-     * @returns JSON Object with 
+     * 
      * 
      */
     async function getVacData(){
@@ -92,21 +92,21 @@ const nameConv = {
             var loc = nameConv[pfizerData[row].jurisdiction.replace(/\s/g,"")];
             if(typeof loc !== 'undefined'){
 
-            var date = pfizerData[row].week_of_allocations.slice(0,-13);
+            var onlyDate = pfizerData[row].week_of_allocations.slice(0,-13);
+            var dateFormat = onlyDate.substring(5,7) + '/' + onlyDate.substring(8,10) + '/' + onlyDate.substring(0,4);
             var totalVac = pfizerData[row]._1st_dose_allocations + pfizerData[row]._2nd_dose_allocations;
     
         
 
             let pfizerInsert = {
-            vacID : 'pf' + date + loc,
+            vacID : 'pf' + onlyDate + loc,
             location : pfizerData[row].jurisdiction,
-            week_of_allocation : date,
+            week_of_allocation : dateFormat,
             vaccine_amount : totalVac,
             vaccine_type : 'Pfizer'
             
             }
 
-      
 
             insertVac(pfizerInsert);
         }
@@ -117,14 +117,15 @@ const nameConv = {
         var loc = nameConv[modernaData[row].jurisdiction.replace(/\s/g,"")];
         if(typeof loc !== 'undefined'){
 
-        var date = modernaData[row].week_of_allocations.slice(0,-13);
+        var onlyDate = modernaData[row].week_of_allocations.slice(0,-13);
+        let dateFormat = onlyDate.substring(5,7) + '/' + onlyDate.substring(8,10) + '/' + onlyDate.substring(0,4);
         var totalVac = modernaData[row]._1st_dose_allocations + modernaData[row]._2nd_dose_allocations;
 
 
         let modernaInsert = {
-        vacID : 'mo' + date + loc,
+        vacID : 'mo' + onlyDate + loc,
         location : modernaData[row].jurisdiction,
-        week_of_allocation : date,
+        week_of_allocation : dateFormat,
         vaccine_amount : totalVac,
         vaccine_type : 'Moderna'
         
@@ -141,20 +142,20 @@ const nameConv = {
         var loc = nameConv[jansData[row].jurisdiction.replace(/\s/g,"")];
         if(typeof loc !== 'undefined'){
 
-        var date = jansData[row].week_of_allocations.slice(0,-13);
-
+        var onlyDate = jansData[row].week_of_allocations.slice(0,-13);
+        let dateFormat = onlyDate.substring(5,7) + '/' + onlyDate.substring(8,10) + '/' + onlyDate.substring(0,4);
 
         let jansInsert = {
-        vacID : 'ja' + date + loc,
+        vacID : 'ja' + onlyDate + loc,
         location : jansData[row].jurisdiction,
-        week_of_allocation : date,
+        week_of_allocation : dateFormat,
         vaccine_amount : jansData[row]._1st_dose_allocations,
         vaccine_type : 'Janssen'
         
         }
 
     
-
+    
         insertVac(jansInsert);
         }
     }
