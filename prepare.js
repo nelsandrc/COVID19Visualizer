@@ -63,7 +63,7 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 
 /**
  * @description Meant to fetch data from the CDC proivded API
- *              to retrieve data from certain parameters
+ *              with certain parameters
  *              This includes total cases, new cases, total deaths, and new deaths 
  * 
  * @return Json object called data
@@ -83,8 +83,9 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
     let cdcResponse = await fetch(url + submission_date + param);
     let data = await cdcResponse.json();
 
+    let days = 0;
     //Keeps lookinf for data if data from submission date contained none
-    while(data.length == 0){
+    while(data.length == 0 && days >= 6){
     //Sets date to one day prior to one the one its at right now
     date.setDate(date.getDate()-1);
     submission_date = await date.toISOString().slice(0, -14);
@@ -93,6 +94,8 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
     //fetches data from new submission date
     cdcResponse = await fetch(url + submission_date + param);
     data = await cdcResponse.json();
+
+    days = days + 1;
     }
 
     console.log("found data for this date: " + submission_date);
@@ -105,9 +108,10 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 /**
  * @description Takes data from APIs, does formatting on data,
  *              and then sends data to Database through set connection
- *              and then ends connection
+ *              and then ends connection. Code that needs to be executed on
+ *              a daily basis is put here
  */
-async function executeDaily(){
+async function insertCovid(){
 
     console.log('Executing');
     //retreives data that was fetched from CDC API
@@ -146,7 +150,7 @@ endConnection();
 
 }
 
-executeDaily();
+insertCovid();
 
 
 
