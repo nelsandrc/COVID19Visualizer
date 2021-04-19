@@ -85,7 +85,7 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 
     let days = 0;
     //Keeps lookinf for data if data from submission date contained none
-    while(data.length == 0 && days >= 6){
+    while(data.length == 0 && days <= 6){
     //Sets date to one day prior to one the one its at right now
     date.setDate(date.getDate()-1);
     submission_date = await date.toISOString().slice(0, -14);
@@ -120,7 +120,6 @@ async function insertCovid(){
     console.log('Begining Insertion of Data');
     //Inserts each row of data into the mySQL
     for(var row in data){
-
       //Skips location if is list of undesired locations
       if(!skipLoc.includes(data[row].state)){
 
@@ -139,7 +138,7 @@ async function insertCovid(){
             n_death: data[row].new_death,
             totaldeath: data[row].tot_death
         };
-    
+
         insertStatement(dataToInsert);
         }
     }
@@ -151,7 +150,5 @@ endConnection();
 }
 
 insertCovid();
-
-
 
 
