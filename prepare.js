@@ -61,6 +61,8 @@ WY: 'Wyoming'
 //Locations not to Include
 const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 
+let nycDeath = 0;
+
 /**
  * @description Meant to fetch data from the CDC proivded API
  *              with certain parameters
@@ -97,6 +99,9 @@ const skipLoc = [ 'AS','DC','FSM','GU','MP','NYC','PR','PW','RMI','VI'];
 
     days = days + 1;
     }
+    //Gets New York City deaths to add to total state deaths
+    let nyResponse = await fetch(url + submission_date + '&state=NYC&$select=tot_death')
+    nycDeath = await nyResponse.json();
 
     console.log("found data for this date: " + submission_date);
 
@@ -118,14 +123,24 @@ async function insertCovid(){
     var data = await getCDCdata();
     
     console.log('Begining Insertion of Data');
+
     //Inserts each row of data into the mySQL
     for(var row in data){
+        //adds in the new york city total death rate for total state deaths
+        if(data[row].state === 'NY'){
+           data[row].tot_death = await (parseInt(data[row].tot_death) + parseInt(nycDeath[0].tot_death));
+
+        }
+
+
+
       //Skips location if is list of undesired locations
       if(!skipLoc.includes(data[row].state)){
 
         let onlyDate = data[row].submission_date.slice(0, -13);
         let dateFormat = onlyDate.substring(5,7) + '/' + onlyDate.substring(8,10) + '/' + onlyDate.substring(0,4);
         let loc = nameConv[data[row].state];
+        
        
         let dataToInsert = {
             ID: onlyDate + data[row].state,
